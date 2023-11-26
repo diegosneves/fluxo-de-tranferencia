@@ -10,6 +10,9 @@ COPY pom.xml .
 # Copia todo o código-fonte para o diretório de trabalho
 COPY . .
 
+# Baixa o Maven Wrapper (se ainda não estiver presente)
+RUN ["./mvnw", "install", "-DskipTests"]
+
 # Compila o código-fonte usando o Maven Wrapper
 RUN ["./mvnw", "package", "-DskipTests"]
 

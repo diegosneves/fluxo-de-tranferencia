@@ -10,11 +10,17 @@ COPY pom.xml .
 # Copia todo o código-fonte para o diretório de trabalho
 COPY . .
 
-# Baixa o Maven Wrapper (se ainda não estiver presente)
-RUN ["./mvnw", "install", "-DskipTests"]
+## Baixa o Maven Wrapper (se ainda não estiver presente)
+#RUN ["./mvnw", "install", "-DskipTests"]
+#
+## Compila o código-fonte usando o Maven Wrapper
+#RUN ["./mvnw", "package", "-DskipTests"]
 
-# Compila o código-fonte usando o Maven Wrapper
-RUN ["./mvnw", "package", "-DskipTests"]
+# Instala o Maven
+RUN apk --no-cache add maven
+
+# Compila o código-fonte usando o Maven
+RUN mvn package -DskipTests
 
 # Expõe a porta 8080 (ou a porta que a sua aplicação Java está configurada para usar)
 EXPOSE 8080

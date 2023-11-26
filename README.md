@@ -3,3 +3,12 @@
 Fluxo de Transferência
 
 ---
+
+## Docker:
+
+Pare executar esta API basta usar o comando abaixo:
+```shell
+docker run --rm -p 8080:8080 -d --name fluxo_transferencia diegoneves/fluxo-tranferencia:latest
+```
+
+---

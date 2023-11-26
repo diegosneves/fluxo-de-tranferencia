@@ -11,12 +11,13 @@ name: CI Fluxo de Transferencia
 on:
   pull_request: # Essas linhas indica que toda pull_request apontada para a branch develop sera executado a CI
     branches:
+      - main
       - develop
 jobs:
   check-application:
     strategy:
       matrix:
-        ubuntu: ['ubuntu-20.04', 'ubuntu-latest']
+        ubuntu: ['ubuntu-latest']
         java: ['17']
     runs-on: ${{ matrix.ubuntu }}
     steps:

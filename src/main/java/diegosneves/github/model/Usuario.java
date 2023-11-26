@@ -4,6 +4,8 @@ import diegosneves.github.enums.TipoDeUsuario;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity(name = "usuarios")
 @Table(name = "usuarios")
 @NoArgsConstructor
@@ -22,5 +24,6 @@ public class Usuario {
     @Column(unique = true)
     private String email;
     private TipoDeUsuario tipoDeUsuario;
+    private BigDecimal saldo;
 
 }

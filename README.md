@@ -1,4 +1,4 @@
-# Fluxo de Transferência [![wakatime](https://wakatime.com/badge/user/018bea20-dbbc-48e2-b101-5415903acf5a/project/018c0943-ec73-4e34-9362-f0ae72855dcf.svg)](https://wakatime.com/@diegosneves/projects/mtibjzqwtu)
+# Fluxo de Transferência [![wakatime](https://wakatime.com/badge/user/018bea20-dbbc-48e2-b101-5415903acf5a/project/018c0943-ec73-4e34-9362-f0ae72855dcf.svg)](https://wakatime.com/@diegosneves/projects/mtibjzqwtu) [![CI Fluxo de Transferencia](https://github.com/diegosneves/fluxo-de-tranferencia/actions/workflows/ci.yml/badge.svg)](https://github.com/diegosneves/fluxo-de-tranferencia/actions/workflows/ci.yml)
 
 Fluxo de Transferência
 
@@ -84,6 +84,7 @@ docker-compose up --build -d
 >
 >  fluxo-app:
 >    image: diegoneves/fluxo-tranferencia:latest
+>    container_name: fluxo_transferencia
 >    ports:
 >      - "8080:8080"
 >    depends_on:

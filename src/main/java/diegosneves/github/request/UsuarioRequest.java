@@ -16,6 +16,7 @@ public class UsuarioRequest {
     private String nomeCompleto;
     private String cpf;
     private String email;
+    private String senha;
     private TipoDeUsuario tipoDeUsuario;
     private BigDecimal saldo;
 

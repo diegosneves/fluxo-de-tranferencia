@@ -5,8 +5,6 @@ services:
     image: mysql:latest
     restart: always
     container_name: sql_transferencia_db
-    networks:
-      - fluxo-bridge
     ports:
       - "3307:3306"
     volumes:
@@ -17,7 +15,3 @@ services:
 
 volumes:
   fluxo-db:
-
-networks:
-  fluxo-bridge:
-    driver: bridge

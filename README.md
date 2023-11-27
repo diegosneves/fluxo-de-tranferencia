@@ -12,12 +12,15 @@ Pare executar esta API basta usar o comando abaixo:
 
 - _O terminal ira exibir as infos da api e ao fechar o container será removido_
 ```shell
-docker run --rm -p 8080:8080 --name fluxo_transferencia diegoneves/fluxo-tranferencia:latest
+docker run --rm -p 8080:8080 --network=fluxo-de-tranferencia_default --name fluxo_transferencia diegoneves/fluxo-tranferencia:latest
 ```
+---
+>_Importante lembrar que a rede(`--network`) deve ser a mesma da base de dados_
+---
 
 - _Caso não queira ocupar/prender o terminal, poderá executar o comando abaixo:_
 ```shell
-docker run --rm -p 8080:8080 -d --name fluxo_transferencia diegoneves/fluxo-tranferencia:latest
+docker run --rm -p 8080:8080 -d --network=fluxo-de-tranferencia_default --name fluxo_transferencia diegoneves/fluxo-tranferencia:latest
 ```
 - _Para visualizar os logs a cada segundo, pode usar o seguinte comando:_
 ```shell

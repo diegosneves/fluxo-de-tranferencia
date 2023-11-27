@@ -42,6 +42,9 @@ services:
       - sqldb
     networks:
       - fluxo-bridge
+    environment:
+      - DB_HOST=sql_transferencia_db
+      - DB_PORT=3306
 
 volumes:
   fluxo-db:

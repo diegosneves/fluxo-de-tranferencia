@@ -1,3 +1,21 @@
+#version: '3.9'
+#
+#services:
+#  sqldb:
+#    image: mysql:latest
+#    restart: always
+#    container_name: sql_transferencia_db
+#    ports:
+#      - "3307:3306"
+#    volumes:
+#      - fluxo-db:/var/lib/mysql
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=Fluxo@123
+#      - MYSQL_DATABASE=transferenciadb
+#
+#volumes:
+#  fluxo-db:
+
 version: '3.9'
 
 services:
@@ -5,6 +23,8 @@ services:
     image: mysql:latest
     restart: always
     container_name: sql_transferencia_db
+    networks:
+      - fluxo-bridge
     ports:
       - "3307:3306"
     volumes:
@@ -13,5 +33,19 @@ services:
       - MYSQL_ROOT_PASSWORD=Fluxo@123
       - MYSQL_DATABASE=transferenciadb
 
+  fluxo-app:
+    image: diegoneves/fluxo-tranferencia:latest
+    container_name: fluxo_transferencia
+    ports:
+      - "8080:8080"
+    depends_on:
+      - sqldb
+    networks:
+      - fluxo-bridge
+
 volumes:
   fluxo-db:
+
+networks:
+  fluxo-bridge:
+    driver: bridge

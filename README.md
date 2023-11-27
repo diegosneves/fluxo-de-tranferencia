@@ -107,3 +107,59 @@ docker-compose down
 ```
 
 ---
+
+## Java:
+
+### Cors:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+@Configuration
+public class CorsConfig {
+
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("*"); // Permitir solicitações de qualquer origem
+        config.addAllowedHeader("*"); // Permitir qualquer cabeçalho
+        config.addAllowedMethod("*"); // Permitir qualquer método (GET, POST, etc.)
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+
+}
+```
+
+### WebSecurityConfiguration:
+
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig {
+
+    @Bean
+  	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+  		http
+  		 	.authorizeHttpRequests((authorizeHttpRequests) ->
+  		 		authorizeHttpRequests.anyRequest().permitAll()
+  		 	);
+  		return http.build();
+  	}
+
+}
+```
+
+---

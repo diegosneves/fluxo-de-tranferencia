@@ -74,6 +74,92 @@ watch -n1 docker logs fluxo_transferencia
 >_**Importante** lembrar que a rede(`--network`) deve ser a **mesma** da base de dados_
 
 ---
+## [Swagger](https://springdoc.org/#Introduction)
+
+- [Swagger - Local](http://localhost:8080/swagger-ui/index.html)
+- [Api - Docs](http://localhost:8080/v3/api-docs)
+
+### Pom.xml:
+
+- dependencia:
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.2.0</version>
+</dependency>
+```
+
+- plugin:
+```xml
+<plugin>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <version>3.2.0</version>
+</plugin>
+
+<plugin>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-maven-plugin</artifactId>
+    <version>1.4</version>
+    <executions>
+        <execution>
+            <id>integration-test</id>
+            <goals>
+                <goal>generate</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+- classe de configuracao:
+
+```java
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.tags.Tag;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+
+@Configuration
+public class OpenApiConfig {
+
+
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(getInfo())
+                .tags(getTags());
+    }
+
+    private Info getInfo() {
+        return new Info()
+                .version("0.0.1")
+                .title("Fluxo de Transferencia")
+                .description("APIs do Fluxo de Transferencia")
+                .contact(new Contact().email("neves.diegoalex@outlook.com").url("https://github.com/diegosneves/fluxo-de-tranferencia"));
+    }
+
+    private List<Tag> getTags() {
+        return List.of();
+    }
+
+}
+```
+
+- `application.yaml`:
+
+```yaml
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+```
+
+---
 
 ## Java:
 
@@ -130,3 +216,4 @@ public class WebSecurityConfig {
 ```
 
 ---
+

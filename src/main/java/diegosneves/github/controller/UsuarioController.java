@@ -1,7 +1,9 @@
 package diegosneves.github.controller;
 
+import diegosneves.github.enums.TipoDeUsuario;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/todos")
+    @Operation(summary = "Retorna todos os usuarios")
     public ResponseEntity<List<Usuario>> obterTodosUsuarios() {
         List<Usuario> usuarios = this.service.obterTodosUsuarios();
 

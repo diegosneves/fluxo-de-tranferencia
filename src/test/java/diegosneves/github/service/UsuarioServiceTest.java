@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +32,8 @@ class UsuarioServiceTest {
 
     private Usuario usuarioTest;
 
+    private List<Usuario> usuarioList;
+
     @BeforeEach
     void setUp() {
 
@@ -38,9 +42,12 @@ class UsuarioServiceTest {
                 .nomeCompleto("Fulando do Teste")
                 .cpf("32212200650")
                 .email("teste@teste.com.br")
+                .senha("Teste@123")
                 .tipoDeUsuario(TipoDeUsuario.COMUM)
                 .saldo(BigDecimal.valueOf(200.0))
                 .build();
+
+        this.usuarioList = List.of(this.usuarioTest);
 
     }
 
@@ -68,6 +75,30 @@ class UsuarioServiceTest {
 
     }
 
+    @Test
+    void quandoChamarObterTodosUsuariosEntaoDeveRetornarUmaListaComValores(){
+        when(this.repository.findAll()).thenReturn(this.usuarioList);
+
+        List<Usuario> obterTodosUsuarios = this.service.obterTodosUsuarios();
+
+        verify(this.repository, times(1)).findAll();
+
+        assertFalse(obterTodosUsuarios.isEmpty());
+        assertEquals(this.usuarioTest, obterTodosUsuarios.stream().findFirst().get());
+
+    }
+
+    @Test
+    void quandoChamarObterTodosUsuariosEntaoDeveRetornarUmaListaVazia(){
+        when(this.repository.findAll()).thenReturn(new ArrayList<>());
+
+        List<Usuario> obterTodosUsuarios = this.service.obterTodosUsuarios();
+
+        verify(this.repository, times(1)).findAll();
+
+        assertTrue(obterTodosUsuarios.isEmpty());
+
+    }
 
 
 }

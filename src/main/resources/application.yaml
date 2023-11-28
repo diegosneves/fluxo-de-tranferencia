@@ -3,10 +3,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/transferenciadb
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/transferenciadb
     username: root
     password: Fluxo@123
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update

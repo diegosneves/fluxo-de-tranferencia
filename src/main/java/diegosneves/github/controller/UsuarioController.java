@@ -1,14 +1,14 @@
 package diegosneves.github.controller;
 
-import diegosneves.github.enums.TipoDeUsuario;
 import diegosneves.github.model.Usuario;
+import diegosneves.github.request.UsuarioRequest;
+import diegosneves.github.response.UsuarioResponse;
 import diegosneves.github.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/todos")
-    @Operation(summary = "Retorna todos os usuarios")
+    @Operation(summary = "Retornar todos os usuarios", tags = "Usuários")
     public ResponseEntity<List<Usuario>> obterTodosUsuarios() {
         List<Usuario> usuarios = this.service.obterTodosUsuarios();
 
@@ -33,6 +33,13 @@ public class UsuarioController {
         }
 
         return ResponseEntity.ok(usuarios);
+    }
+
+    @PostMapping("/cadastro")
+    @Operation(tags = "Usuários", summary = "Cadastrar um novo usuário")
+    public ResponseEntity<UsuarioResponse> cadastroDeUsuario(@RequestBody UsuarioRequest request) {
+        UsuarioResponse usuarioResponse = this.service.cadastrarUsuario(request);
+        return new ResponseEntity<>(usuarioResponse, HttpStatus.CREATED);
     }
 
 }

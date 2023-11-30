@@ -6,7 +6,7 @@ public enum TipoDeUsuario {
 
     @JsonProperty(value = "comum")
     COMUM,
-    @JsonProperty(value = "Lojista")
+    @JsonProperty(value = "lojista")
     LOJISTA;
 
 }

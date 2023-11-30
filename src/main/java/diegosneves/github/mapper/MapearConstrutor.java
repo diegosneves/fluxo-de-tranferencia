@@ -27,7 +27,7 @@ public interface MapearConstrutor {
                 var atributoOrigem = origem.getClass().getDeclaredField(atributo.getName());
                 atributoOrigem.setAccessible(true);
                 atributo.set(novaInstancia, atributoOrigem.get(origem));
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
 

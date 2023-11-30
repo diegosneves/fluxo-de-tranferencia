@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Setter
 public class UsuarioResponse {
 
+    private Long id;
     private String nomeCompleto;
     private String cpf;
     private String email;

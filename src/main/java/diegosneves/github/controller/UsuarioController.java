@@ -1,14 +1,19 @@
 package diegosneves.github.controller;
 
-import diegosneves.github.enums.TipoDeUsuario;
 import diegosneves.github.model.Usuario;
+import diegosneves.github.request.UsuarioRequest;
+import diegosneves.github.response.UsuarioResponse;
 import diegosneves.github.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,15 +29,27 @@ public class UsuarioController {
     }
 
     @GetMapping("/todos")
-    @Operation(summary = "Retorna todos os usuarios")
-    public ResponseEntity<List<Usuario>> obterTodosUsuarios() {
-        List<Usuario> usuarios = this.service.obterTodosUsuarios();
+    @Operation(summary = "Retornar todos os usuarios", tags = "Usuários")
+    public ResponseEntity<List<UsuarioResponse>> obterTodosUsuarios() {
+        List<UsuarioResponse> usuarioResponses = this.service.obterTodosUsuarios();
 
-        if (usuarios.isEmpty()) {
+        if (usuarioResponses.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(usuarios);
+        return ResponseEntity.ok(usuarioResponses);
+    }
+
+    @PostMapping("/cadastro")
+    @Operation(tags = "Usuários", summary = "Cadastrar um novo usuário")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Usuário Cadastrado", content = @Content),
+            @ApiResponse(responseCode = "409", description = "CPF ou E-mail já cadastrado na base de dados", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Falha ao cadastrar o novo usuário", content = @Content)
+    })
+    public ResponseEntity<UsuarioResponse> cadastroDeUsuario(@RequestBody UsuarioRequest request) {
+        UsuarioResponse usuarioResponse = this.service.cadastrarUsuario(request);
+        return new ResponseEntity<>(usuarioResponse, HttpStatus.CREATED);
     }
 
 }

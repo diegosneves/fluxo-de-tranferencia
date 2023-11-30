@@ -22,14 +22,15 @@ public class OpenApiConfig {
 
     private Info getInfo() {
         return new Info()
-                .version("0.0.1")
+                .version("v0.0.1")
                 .title("Fluxo de Transferencia")
-                .description("APIs do Fluxo de Transferencia")
-                .contact(new Contact().email("neves.diegoalex@outlook.com").url("https://github.com/diegosneves/fluxo-de-tranferencia"));
+                .description("API do Fluxo de Transferencia")
+                .contact(new Contact().email("neves.diegoalex@outlook.com").url("https://github.com/diegosneves/fluxo-de-tranferencia").name("Diego Neves"));
     }
 
     private List<Tag> getTags() {
-        return List.of();
+        return List.of(new Tag().name("Usuários").description("Operações relacionadas a usuários"),
+                new Tag().name("Transação").description("Operações relacionadas a transações"));
     }
 
 }

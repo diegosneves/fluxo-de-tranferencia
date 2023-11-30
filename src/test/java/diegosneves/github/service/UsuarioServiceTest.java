@@ -1,17 +1,27 @@
 package diegosneves.github.service;
 
 import diegosneves.github.enums.TipoDeUsuario;
+import diegosneves.github.exception.CpfJaCadastradoException;
+import diegosneves.github.exception.EmailJaCadastradoException;
 import diegosneves.github.exception.ManipuladorDeErro;
 import diegosneves.github.exception.UsuarioNaoEncontradoException;
+import diegosneves.github.mapper.MapearConstrutor;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.UsuarioRepository;
+import diegosneves.github.request.UsuarioRequest;
+import diegosneves.github.response.UsuarioResponse;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +40,12 @@ class UsuarioServiceTest {
     @Mock
     private UsuarioRepository repository;
 
+    @Captor
+    private ArgumentCaptor<Usuario> usuarioCaptor;
+
     private Usuario usuarioTest;
+    private UsuarioRequest request;
+    private UsuarioResponse response;
 
     private List<Usuario> usuarioList;
 
@@ -49,6 +64,14 @@ class UsuarioServiceTest {
 
         this.usuarioList = List.of(this.usuarioTest);
 
+        this.request = UsuarioRequest.builder()
+                .cpf("31818974770")
+                .tipoDeUsuario(TipoDeUsuario.COMUM)
+                .email("teste@gmail.com")
+                .nomeCompleto("Antonio Canova")
+                .saldo(BigDecimal.TEN)
+                .build();
+
     }
 
     @Test
@@ -58,7 +81,6 @@ class UsuarioServiceTest {
         Usuario retorno = this.service.findUsuarioByCpf("32212200650");
 
         verify(this.repository, times(1)).findUsuarioByCpf(anyString());
-
         assertEquals(this.usuarioTest.getEmail(), retorno.getEmail());
 
     }
@@ -66,7 +88,6 @@ class UsuarioServiceTest {
     @Test
     void quandoReceberUmCpfNaoCadastradoEntaoUmUsuarioNaoEncontradoDeveSerLancada() {
         String cpfNaoCadastrado = "01073919102";
-
         when(this.repository.findUsuarioByCpf(anyString())).thenReturn(Optional.empty());
 
         Exception resultado = assertThrows(UsuarioNaoEncontradoException.class, () -> this.service.findUsuarioByCpf(cpfNaoCadastrado));
@@ -76,29 +97,111 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void quandoChamarObterTodosUsuariosEntaoDeveRetornarUmaListaComValores(){
+    void quandoChamarObterTodosUsuariosEntaoDeveRetornarUmaListaComValores() {
+        this.response = MapearConstrutor.construirNovoDe(UsuarioResponse.class, this.usuarioTest);
         when(this.repository.findAll()).thenReturn(this.usuarioList);
 
-        List<Usuario> obterTodosUsuarios = this.service.obterTodosUsuarios();
+        List<UsuarioResponse> obterTodosUsuarios = this.service.obterTodosUsuarios();
 
         verify(this.repository, times(1)).findAll();
-
         assertFalse(obterTodosUsuarios.isEmpty());
-        assertEquals(this.usuarioTest, obterTodosUsuarios.stream().findFirst().get());
+        assertEquals(this.response.getCpf(), obterTodosUsuarios.stream().findFirst().get().getCpf());
 
     }
 
     @Test
-    void quandoChamarObterTodosUsuariosEntaoDeveRetornarUmaListaVazia(){
+    void quandoChamarObterTodosUsuariosEntaoDeveRetornarUmaListaVazia() {
         when(this.repository.findAll()).thenReturn(new ArrayList<>());
 
-        List<Usuario> obterTodosUsuarios = this.service.obterTodosUsuarios();
+        List<UsuarioResponse> obterTodosUsuarios = this.service.obterTodosUsuarios();
 
         verify(this.repository, times(1)).findAll();
-
         assertTrue(obterTodosUsuarios.isEmpty());
 
     }
+
+    @Test
+    void quandoCadastrarUsuarioReceberUmUsuarioRequestValidoEntaoUmNovoUsuarioDeveSerCadastrado() {
+        String cpf = "31818974770";
+        String nomeCompleto = "Antonio Canova";
+        this.usuarioTest.setCpf(cpf);
+        this.usuarioTest.setNomeCompleto(nomeCompleto);
+        when(this.repository.save(any(Usuario.class))).thenReturn(this.usuarioTest);
+
+        UsuarioResponse resultado = this.service.cadastrarUsuario(request);
+
+        verify(this.repository, times(1)).save(this.usuarioCaptor.capture());
+        assertEquals(cpf, usuarioCaptor.getValue().getCpf());
+        assertEquals(nomeCompleto, usuarioCaptor.getValue().getNomeCompleto());
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        assertEquals(cpf, resultado.getCpf());
+        assertEquals(nomeCompleto, resultado.getNomeCompleto());
+
+    }
+
+    @Test
+    void quandoCadastrarUsuarioReceberUmUsuarioComCpfJaCadastradoEntaoUmaCpfJaCadastradoExceptionDeveSerLancada() {
+        String cpf = "32212200650";
+        this.request.setCpf(cpf);
+        when(this.repository.findUsuarioByCpfOrEmail(eq(cpf), anyString())).thenReturn(Optional.of(this.usuarioTest));
+
+        CpfJaCadastradoException exception = assertThrows(CpfJaCadastradoException.class, () -> this.service.cadastrarUsuario(this.request));
+
+        verify(this.repository, times(1)).findUsuarioByCpfOrEmail(eq(cpf), anyString());
+        assertEquals(ManipuladorDeErro.CPF_DUPLICADO.mensagemDeErro(cpf), exception.getMessage());
+
+    }
+
+    @Test
+    void quandoCadastrarUsuarioReceberUmUsuarioComEmailJaCadastradoEntaoUmaEmailJaCadastradoExceptionDeveSerLancada() {
+        String email = "teste@teste.com.br";
+        this.request.setEmail(email);
+        when(this.repository.findUsuarioByCpfOrEmail(anyString(), eq(email))).thenReturn(Optional.of(this.usuarioTest));
+
+        EmailJaCadastradoException exception = assertThrows(EmailJaCadastradoException.class, () -> this.service.cadastrarUsuario(this.request));
+
+        verify(this.repository, times(1)).findUsuarioByCpfOrEmail(anyString(), eq(email));
+        assertEquals(ManipuladorDeErro.EMAIL_DUPLICADO.mensagemDeErro(email), exception.getMessage());
+
+    }
+
+    @Test
+    @SneakyThrows
+    void quandoValidarCpfAndEmailReceberUmCpfJaCadastradoEntaoUmaCpfJaCadastradoExceptionDeveSerLancada() {
+        String cpf = "32212200650";
+        when(this.repository.findUsuarioByCpfOrEmail(eq(cpf), anyString())).thenReturn(Optional.of(this.usuarioTest));
+        Method method = this.service.getClass().getDeclaredMethod("validarCpfAndEmail", String.class, String.class);
+        method.setAccessible(true);
+
+        InvocationTargetException exception = assertThrows(InvocationTargetException.class, () -> method.invoke(this.service, cpf, "anyString()"));
+        Throwable realException = exception.getTargetException();
+
+        verify(this.repository, times(1)).findUsuarioByCpfOrEmail(eq(cpf), anyString());
+
+        assertTrue(realException instanceof CpfJaCadastradoException);
+        assertEquals(ManipuladorDeErro.CPF_DUPLICADO.mensagemDeErro(cpf), realException.getMessage());
+
+    }
+
+    @Test
+    @SneakyThrows
+    void quandoValidarCpfAndEmailReceberUmEmailJaCadastradoEntaoUmEmailJaCadastradoExceptionDeveSerLancada() {
+        String email = "teste@teste.com.br";
+        when(this.repository.findUsuarioByCpfOrEmail(anyString(), eq(email))).thenReturn(Optional.of(this.usuarioTest));
+        Method method = this.service.getClass().getDeclaredMethod("validarCpfAndEmail", String.class, String.class);
+        method.setAccessible(true);
+
+        InvocationTargetException exception = assertThrows(InvocationTargetException.class, () -> method.invoke(this.service, "123456", email));
+        Throwable realException = exception.getTargetException();
+
+        verify(this.repository, times(1)).findUsuarioByCpfOrEmail(anyString(), eq(email));
+
+        assertTrue(realException instanceof EmailJaCadastradoException);
+        assertEquals(ManipuladorDeErro.EMAIL_DUPLICADO.mensagemDeErro(email), realException.getMessage());
+
+    }
+
 
 
 }

@@ -7,4 +7,8 @@ public class ConstrutorPadraoNaoDefinido extends RuntimeException {
     public ConstrutorPadraoNaoDefinido(String message) {
         super(ERRO.mensagemDeErro(message));
     }
+
+    public ConstrutorPadraoNaoDefinido(String message, Throwable e) {
+        super(ERRO.mensagemDeErro(message), e);
+    }
 }

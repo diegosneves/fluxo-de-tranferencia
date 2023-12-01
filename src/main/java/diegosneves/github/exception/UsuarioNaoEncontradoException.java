@@ -8,4 +8,8 @@ public class UsuarioNaoEncontradoException extends RuntimeException {
         super(ERRO.mensagemDeErro(valor));
     }
 
+    public UsuarioNaoEncontradoException(String valor, Throwable throwable) {
+        super(ERRO.mensagemDeErro(valor), throwable);
+    }
+
 }

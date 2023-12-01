@@ -40,6 +40,12 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(UsuarioNaoEncontradoException.ERRO.getStatusCode()).body(dto);
     }
 
+    @ExceptionHandler(ServicoAutorizadorException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(ServicoAutorizadorException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), ServicoAutorizadorException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(ServicoAutorizadorException.ERRO.getStatusCode()).body(dto);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDTO> erroGeneralizado(Exception exception) {

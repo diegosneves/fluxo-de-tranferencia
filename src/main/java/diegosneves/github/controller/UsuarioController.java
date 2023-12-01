@@ -1,13 +1,10 @@
 package diegosneves.github.controller;
 
-import diegosneves.github.model.Usuario;
 import diegosneves.github.request.UsuarioRequest;
 import diegosneves.github.response.UsuarioResponse;
 import diegosneves.github.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;

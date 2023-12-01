@@ -1,6 +1,5 @@
 package diegosneves.github.service;
 
-import diegosneves.github.enums.TipoDeUsuario;
 import diegosneves.github.exception.CpfJaCadastradoException;
 import diegosneves.github.exception.EmailJaCadastradoException;
 import diegosneves.github.exception.UsuarioNaoEncontradoException;
@@ -12,8 +11,6 @@ import diegosneves.github.response.UsuarioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

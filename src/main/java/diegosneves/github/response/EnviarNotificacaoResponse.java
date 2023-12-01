@@ -7,8 +7,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class ServicoAutorizadorResponse {
+public class EnviarNotificacaoResponse {
 
-    private String message;
+    private Boolean message;
 
 }

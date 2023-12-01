@@ -46,6 +46,12 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(ServicoAutorizadorException.ERRO.getStatusCode()).body(dto);
     }
 
+    @ExceptionHandler(EnvioNotificacaoException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(EnvioNotificacaoException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), EnvioNotificacaoException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(EnvioNotificacaoException.ERRO.getStatusCode()).body(dto);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDTO> erroGeneralizado(Exception exception) {

@@ -19,7 +19,7 @@ public class ServicoAutorizadorAdapter extends HttpAdapter{
         this.url = url;
     }
 
-    public ServicoAutorizadorResponse getAutorizacao(){
+    public ServicoAutorizadorResponse getAutorizacaoParaTransferencia(){
         ServicoAutorizadorResponse response;
         try {
             response = this.getRestTemplateSimpleWebClient().getRestTemplate().getForEntity(this.url, ServicoAutorizadorResponse.class).getBody();

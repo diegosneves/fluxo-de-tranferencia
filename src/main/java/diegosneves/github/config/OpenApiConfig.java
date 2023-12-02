@@ -30,7 +30,7 @@ public class OpenApiConfig {
 
     private List<Tag> getTags() {
         return List.of(new Tag().name("Usuários").description("Operações relacionadas a usuários"),
-                new Tag().name("Transação").description("Operações relacionadas a transações"));
+                new Tag().name("Transação").description("Operações relacionadas a transações financeiras"));
     }
 
 }

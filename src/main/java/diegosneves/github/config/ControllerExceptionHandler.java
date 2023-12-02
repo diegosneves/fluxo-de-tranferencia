@@ -34,10 +34,16 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(MapearObjetoException.ERRO.getStatusCode()).body(dto);
     }
 
-    @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(UsuarioNaoEncontradoException exception) {
-        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), UsuarioNaoEncontradoException.ERRO.getStatusCode().value());
-        return ResponseEntity.status(UsuarioNaoEncontradoException.ERRO.getStatusCode()).body(dto);
+    @ExceptionHandler(CpfNaoEncontradoException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(CpfNaoEncontradoException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), CpfNaoEncontradoException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(CpfNaoEncontradoException.ERRO.getStatusCode()).body(dto);
+    }
+
+    @ExceptionHandler(IdInvalidoException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(IdInvalidoException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), IdInvalidoException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(IdInvalidoException.ERRO.getStatusCode()).body(dto);
     }
 
     @ExceptionHandler(ServicoAutorizadorException.class)

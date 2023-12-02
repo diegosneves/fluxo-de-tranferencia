@@ -1,10 +1,7 @@
 package diegosneves.github.service;
 
 import diegosneves.github.enums.TipoDeUsuario;
-import diegosneves.github.exception.CpfJaCadastradoException;
-import diegosneves.github.exception.EmailJaCadastradoException;
-import diegosneves.github.exception.ManipuladorDeErro;
-import diegosneves.github.exception.UsuarioNaoEncontradoException;
+import diegosneves.github.exception.*;
 import diegosneves.github.mapper.MapearConstrutor;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.UsuarioRepository;
@@ -90,9 +87,9 @@ class UsuarioServiceTest {
         String cpfNaoCadastrado = "01073919102";
         when(this.repository.findUsuarioByCpf(anyString())).thenReturn(Optional.empty());
 
-        Exception resultado = assertThrows(UsuarioNaoEncontradoException.class, () -> this.service.findUsuarioByCpf(cpfNaoCadastrado));
+        Exception resultado = assertThrows(CpfNaoEncontradoException.class, () -> this.service.findUsuarioByCpf(cpfNaoCadastrado));
 
-        assertEquals(ManipuladorDeErro.USUARIO_NAO_ENCONTRADO.mensagemDeErro(cpfNaoCadastrado), resultado.getMessage());
+        assertEquals(ManipuladorDeErro.CPF_USUARIO_NAO_ENCONTRADO.mensagemDeErro(cpfNaoCadastrado), resultado.getMessage());
 
     }
 
@@ -202,6 +199,30 @@ class UsuarioServiceTest {
 
     }
 
+    @Test
+    void quandoEncontrarUsuarioPorIdReceberUmIdValidoEntaoUmUsuarioDeveSerRetornado() {
 
+        when(this.repository.findUsuarioById(1L)).thenReturn(Optional.of(this.usuarioTest));
+
+        Usuario actual = this.service.encontrarUsuarioPorId(1L);
+
+        verify(this.repository, times(1)).findUsuarioById(1L);
+
+        assertEquals(this.usuarioTest, actual);
+
+    }
+
+    @Test
+    void quandoEncontrarUsuarioPorIdReceberUmIdInvalidoEntaoUmaIdInvalidoExceptionDeveSerLancada() {
+
+        when(this.repository.findUsuarioById(1L)).thenReturn(Optional.empty());
+
+        IdInvalidoException exception = assertThrows(IdInvalidoException.class, () -> this.service.encontrarUsuarioPorId(1L));
+
+        verify(this.repository, times(1)).findUsuarioById(1L);
+
+        assertEquals(ManipuladorDeErro.ID_USUARIO_NAO_ENCONTRADO.mensagemDeErro(String.valueOf(1L)), exception.getMessage());
+
+    }
 
 }

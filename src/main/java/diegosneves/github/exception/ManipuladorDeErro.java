@@ -8,6 +8,7 @@ public enum ManipuladorDeErro {
     ID_USUARIO_NAO_ENCONTRADO("O ID [ %s ] de usuário não existe.", HttpStatus.NOT_FOUND),
     LOJISTA_PAGADOR("O usuário de CPF [ %s ] é um LOJISTA e não pode efetuar pagamento.", HttpStatus.BAD_REQUEST),
     SALDO_INSUFICIENTE("O usuário de CPF [ %s ] não possui saldo suficiente.", HttpStatus.BAD_REQUEST),
+    TRANSACAO_NAO_AUTORIZADA("Transação no valor de [ %s ] não Autorizada.", HttpStatus.BAD_REQUEST),
     FALHA_NO_MAPEAMENTO("Ocorreu um erro ao tentar mapear a classe [ %s ].", HttpStatus.INTERNAL_SERVER_ERROR),
     CPF_DUPLICADO("O CPF [ %s ] já foi cadastrado na base de dados", HttpStatus.CONFLICT),
     EMAIL_DUPLICADO("O E-mail [ %s ] já foi cadastrado na base de dados", HttpStatus.CONFLICT),

@@ -67,4 +67,9 @@ public class UsuarioService {
         }
         return usuarioOptional.get();
     }
+
+    public void atualizarUsuarioNaBaseDeDados(Usuario usuario) {
+        this.repository.save(usuario);
+    }
+
 }

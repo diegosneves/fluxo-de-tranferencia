@@ -13,8 +13,9 @@ import java.time.LocalDateTime;
 @Setter
 public class TransacaoResponse {
 
-    private BigDecimal valorDaTransacao;
-    private Boolean notificacaoEnviada;
+    private BigDecimal valorTransacao;
+    private Boolean notificacaoEnviadaPagador;
+    private Boolean notificacaoEnviadaRecebedor;
     private String statusDaTransacao;
     private LocalDateTime dataTransacao;
 

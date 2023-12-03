@@ -1,41 +1,85 @@
 package diegosneves.github.service;
 
-import diegosneves.github.adapter.EnviarNotificacaoAdapter;
-import diegosneves.github.adapter.ServicoAutorizadorAdapter;
+import diegosneves.github.enums.TipoDeTransacao;
 import diegosneves.github.enums.TipoDeUsuario;
+import diegosneves.github.exception.AutorizacaoTransacaoException;
 import diegosneves.github.exception.LojistaPagadorException;
 import diegosneves.github.exception.SaldoInsuficienteException;
+import diegosneves.github.mapper.MapearConstrutor;
+import diegosneves.github.model.Transacao;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.TransacaoRepository;
 import diegosneves.github.request.TransacaoRequest;
+import diegosneves.github.response.ServicoAutorizadorResponse;
 import diegosneves.github.response.TransacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 public class TransacaoService {
 
+    private static final String AUTORIZADO = "Autorizado";
     private final TransacaoRepository repository;
-    private final EnviarNotificacaoAdapter notificacaoAdapter;
-    private final ServicoAutorizadorAdapter servicoAutorizadorAdapter;
+    private final NotificacaoService notificacaoService;
+    private final AutorizadorService autorizadorService;
 
     private final UsuarioService usuarioService;
 
     @Autowired
-    public TransacaoService(TransacaoRepository repository, EnviarNotificacaoAdapter notificacaoAdapter, ServicoAutorizadorAdapter servicoAutorizadorAdapter, UsuarioService usuarioService) {
+    public TransacaoService(TransacaoRepository repository, NotificacaoService notificacaoService, AutorizadorService autorizadorService, UsuarioService usuarioService) {
         this.repository = repository;
-        this.notificacaoAdapter = notificacaoAdapter;
-        this.servicoAutorizadorAdapter = servicoAutorizadorAdapter;
+        this.notificacaoService = notificacaoService;
+        this.autorizadorService = autorizadorService;
         this.usuarioService = usuarioService;
     }
 
 
     public TransacaoResponse transferenciaFinanceira(TransacaoRequest request) {
         Usuario recebdor = this.usuarioService.encontrarUsuarioPorId(request.getIdRecebedor());
-        Usuario pagador = validarUsuarioPagador(this.usuarioService.encontrarUsuarioPorId(request.getIdPagador()), request.getValor());
-        return null;
+        Usuario pagador = this.validarUsuarioPagador(this.usuarioService.encontrarUsuarioPorId(request.getIdPagador()), request.getValor());
+
+        TransacaoResponse response = MapearConstrutor.construirNovoDe(TransacaoResponse.class, realizarTranferenciaFinanceira(pagador, recebdor, request.getValor()));
+        response.setStatusDaTransacao(AUTORIZADO);
+
+        response.setNotificacaoEnviadaPagador(this.enviarNotificacao(pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(recebdor.getCpf())));
+        response.setNotificacaoEnviadaRecebedor(this.enviarNotificacao(recebdor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(pagador.getCpf())));
+
+        return response;
+    }
+
+    private boolean enviarNotificacao(String email, String mensagem) {
+        return this.notificacaoService.enviarNotificacao(email, mensagem);
+    }
+
+    private Transacao realizarTranferenciaFinanceira(Usuario pagador, Usuario recebdor, BigDecimal valor) {
+        Transacao transacao = this.autorizarTransacao(pagador, recebdor, valor);
+
+        pagador.setSaldo(pagador.getSaldo().subtract(valor));
+        recebdor.setSaldo(recebdor.getSaldo().add(valor));
+
+        this.usuarioService.atualizarUsuarioNaBaseDeDados(pagador);
+        this.usuarioService.atualizarUsuarioNaBaseDeDados(recebdor);
+
+        return this.repository.save(transacao);
+    }
+
+    private Transacao autorizarTransacao(Usuario pagador, Usuario recebdor, BigDecimal valor) throws AutorizacaoTransacaoException {
+        Transacao transacao = Transacao.builder()
+                .valorTransacao(valor)
+                .recebedor(recebdor)
+                .pagador(pagador)
+                .build();
+
+        ServicoAutorizadorResponse autorizacaoParaTransferencia = this.autorizadorService.autorizarTransacao(transacao);
+
+        if (!AUTORIZADO.equals(autorizacaoParaTransferencia.getMessage()) || autorizacaoParaTransferencia.getDataDaAprovacao() == null) {
+            throw new AutorizacaoTransacaoException(transacao.getValorTransacao().toString());
+        }
+        transacao.setDataTransacao(autorizacaoParaTransferencia.getDataDaAprovacao());
+        return transacao;
     }
 
     private Usuario validarUsuarioPagador(Usuario pagador, BigDecimal valor) throws LojistaPagadorException, SaldoInsuficienteException {

@@ -2,6 +2,8 @@ package diegosneves.github.response;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -10,5 +12,6 @@ import lombok.*;
 public class ServicoAutorizadorResponse {
 
     private String message;
+    private LocalDateTime dataDaAprovacao;
 
 }

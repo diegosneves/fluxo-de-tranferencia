@@ -58,6 +58,23 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(EnvioNotificacaoException.ERRO.getStatusCode()).body(dto);
     }
 
+    @ExceptionHandler(SaldoInsuficienteException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(SaldoInsuficienteException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), SaldoInsuficienteException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(SaldoInsuficienteException.ERRO.getStatusCode()).body(dto);
+    }
+
+    @ExceptionHandler(LojistaPagadorException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(LojistaPagadorException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), LojistaPagadorException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(LojistaPagadorException.ERRO.getStatusCode()).body(dto);
+    }
+
+    @ExceptionHandler(AutorizacaoTransacaoException.class)
+    public ResponseEntity<ExceptionDTO> usuarioNaoEncontrado(AutorizacaoTransacaoException exception) {
+        ExceptionDTO dto = new ExceptionDTO(exception.getMessage(), AutorizacaoTransacaoException.ERRO.getStatusCode().value());
+        return ResponseEntity.status(AutorizacaoTransacaoException.ERRO.getStatusCode()).body(dto);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionDTO> erroGeneralizado(Exception exception) {

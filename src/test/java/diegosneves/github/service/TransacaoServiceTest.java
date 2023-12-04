@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -36,9 +37,9 @@ class TransacaoServiceTest {
     @Mock
     private TransacaoRepository repository;
     @Mock
-    private EnviarNotificacaoAdapter notificacaoAdapter;
+    private NotificacaoService notificacaoService;
     @Mock
-    private ServicoAutorizadorAdapter servicoAutorizadorAdapter;
+    private AutorizadorService autorizadorService;
 
     private Transacao transacao;
     private TransacaoRequest request;
@@ -73,6 +74,20 @@ class TransacaoServiceTest {
     void quandoReceberUmaTransacaoRequestComTodosDadosOkEntaoUmaTransacaoDeveSerRegistrada() {
         when(this.usuarioService.encontrarUsuarioPorId(1L)).thenReturn(this.pagador);
         when(this.usuarioService.encontrarUsuarioPorId(2L)).thenReturn(this.recebedor);
+
+    }
+
+    @Test
+    @SneakyThrows
+    void quandoEnviarNotificaoReceberEmailAndMensagemEntaoTrueDeverRetornadoEmCasoDeSucesso() {
+        when(this.notificacaoService.enviarNotificacao(anyString(), anyString())).thenReturn(true);
+
+        Method method = this.service.getClass().getDeclaredMethod("enviarNotificacao", String.class, String.class);
+        method.setAccessible(true);
+
+        Boolean retorno = (Boolean) method.invoke(this.service, "email", "mensagem");
+
+        assertTrue(retorno);
 
     }
 

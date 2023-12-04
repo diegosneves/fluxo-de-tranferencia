@@ -19,7 +19,7 @@ public class EnviarNotificacaoAdapter extends HttpAdapter {
         this.url = url;
     }
 
-    public EnviarNotificacaoResponse postAutorizacaoDeEnvio(String email, String autorizacao){
+    public EnviarNotificacaoResponse postAutorizacaoDeEnvio(String email, String autorizacao) throws EnvioNotificacaoException {
         EnviarNotificacaoResponse response;
         NotificacaoRequest request = NotificacaoRequest.builder()
                 .email(email)

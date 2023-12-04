@@ -41,7 +41,7 @@ public class TransacaoService {
         Usuario recebdor = this.usuarioService.encontrarUsuarioPorId(request.getIdRecebedor());
         Usuario pagador = this.validarUsuarioPagador(this.usuarioService.encontrarUsuarioPorId(request.getIdPagador()), request.getValor());
 
-        TransacaoResponse response = MapearConstrutor.construirNovoDe(TransacaoResponse.class, realizarTranferenciaFinanceira(pagador, recebdor, request.getValor()));
+        TransacaoResponse response = MapearConstrutor.construirNovoDe(TransacaoResponse.class, this.realizarTranferenciaFinanceira(pagador, recebdor, request.getValor()));
         response.setStatusDaTransacao(AUTORIZADO);
 
         response.setNotificacaoEnviadaPagador(this.enviarNotificacao(pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(recebdor.getCpf())));
@@ -73,13 +73,7 @@ public class TransacaoService {
                 .pagador(pagador)
                 .build();
 
-        ServicoAutorizadorResponse autorizacaoParaTransferencia = this.autorizadorService.autorizarTransacao(transacao);
-
-        if (!AUTORIZADO.equals(autorizacaoParaTransferencia.getMessage()) || autorizacaoParaTransferencia.getDataDaAprovacao() == null) {
-            throw new AutorizacaoTransacaoException(transacao.getValorTransacao().toString());
-        }
-        transacao.setDataTransacao(autorizacaoParaTransferencia.getDataDaAprovacao());
-        return transacao;
+        return this.autorizadorService.autorizarTransacao(transacao);
     }
 
     private Usuario validarUsuarioPagador(Usuario pagador, BigDecimal valor) throws LojistaPagadorException, SaldoInsuficienteException {

@@ -24,7 +24,7 @@ public class ServicoAutorizadorAdapter extends HttpAdapter{
         this.url = url;
     }
 
-    public ServicoAutorizadorResponse postAutorizacaoParaTransferencia(Transacao transacao){
+    public ServicoAutorizadorResponse postAutorizacaoParaTransferencia(Transacao transacao) throws ServicoAutorizadorException {
         ServicoAutorizadorResponse response;
         TransacaoDTO request = MapearConstrutor.construirNovoDe(TransacaoDTO.class, transacao);
         try {

@@ -225,4 +225,13 @@ class UsuarioServiceTest {
 
     }
 
+    @Test
+    void quandoAtualizarUsuarioNaBaseDeDadosReceberUmUsuarioValidoEntaoEsteUsuarioDeveSerAtualizadoNaBaseDeDados() {
+
+        this.service.atualizarUsuarioNaBaseDeDados(this.usuarioTest);
+
+        verify(this.repository, times(1)).save(any(Usuario.class));
+
+    }
+
 }

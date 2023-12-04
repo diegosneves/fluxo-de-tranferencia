@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity(name = "usuarios")
 @Table(name = "usuarios")
@@ -26,5 +28,14 @@ public class Usuario {
     private String senha;
     private TipoDeUsuario tipoDeUsuario;
     private BigDecimal saldo;
+    @OneToMany(mappedBy = "pagador")
+    private List<Transacao> transacoesPagas;
+    @OneToMany(mappedBy = "recebedor")
+    private List<Transacao> transacoesRecebidas;
+
+    {
+        this.transacoesPagas = new ArrayList<>();
+        this.transacoesRecebidas = new ArrayList<>();
+    }
 
 }

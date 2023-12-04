@@ -6,4 +6,8 @@ public class CpfJaCadastradoException extends RuntimeException {
     public CpfJaCadastradoException(String cpf) {
         super(ERRO.mensagemDeErro(cpf));
     }
+
+    public CpfJaCadastradoException(String cpf, Throwable throwable) {
+        super(ERRO.mensagemDeErro(cpf), throwable);
+    }
 }

@@ -16,9 +16,9 @@ public interface MapearConstrutor {
         try {
             novaInstancia = classeDeDestino.getConstructor().newInstance();
         } catch (NoSuchMethodException e) {
-            throw new ConstrutorPadraoNaoDefinido(classeDeDestino.getName());
+            throw new ConstrutorPadraoNaoDefinido(classeDeDestino.getName(), e);
         } catch (Exception e) {
-            throw new MapearObjetoException(classeDeDestino.getName());
+            throw new MapearObjetoException(classeDeDestino.getName(), e);
         }
 
         for(Field atributo : atributos) {

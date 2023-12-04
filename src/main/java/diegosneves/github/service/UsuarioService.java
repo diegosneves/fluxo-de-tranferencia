@@ -1,9 +1,9 @@
 package diegosneves.github.service;
 
-import diegosneves.github.enums.TipoDeUsuario;
 import diegosneves.github.exception.CpfJaCadastradoException;
 import diegosneves.github.exception.EmailJaCadastradoException;
-import diegosneves.github.exception.UsuarioNaoEncontradoException;
+import diegosneves.github.exception.CpfNaoEncontradoException;
+import diegosneves.github.exception.IdInvalidoException;
 import diegosneves.github.mapper.MapearConstrutor;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.UsuarioRepository;
@@ -12,11 +12,8 @@ import diegosneves.github.response.UsuarioResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -31,7 +28,7 @@ public class UsuarioService {
     public Usuario findUsuarioByCpf(String cpf) {
         Optional<Usuario> usuarioOptional = this.repository.findUsuarioByCpf(cpf);
         if (usuarioOptional.isEmpty()) {
-            throw new UsuarioNaoEncontradoException(cpf);
+            throw new CpfNaoEncontradoException(cpf);
         }
         return usuarioOptional.get();
     }
@@ -40,7 +37,7 @@ public class UsuarioService {
     public List<UsuarioResponse> obterTodosUsuarios() {
         List<Usuario> usuarios = this.repository.findAll();
         return usuarios.stream()
-                .map(usuario -> MapearConstrutor.construirNovoDe(UsuarioResponse.class, usuario)).collect(Collectors.toList());
+                .map(usuario -> MapearConstrutor.construirNovoDe(UsuarioResponse.class, usuario)).toList();
     }
 
     public UsuarioResponse cadastrarUsuario(UsuarioRequest request) throws CpfJaCadastradoException, EmailJaCadastradoException {
@@ -62,4 +59,17 @@ public class UsuarioService {
             }
         }
     }
+
+    public Usuario encontrarUsuarioPorId(Long idUsuario) throws IdInvalidoException {
+        Optional<Usuario> usuarioOptional = this.repository.findUsuarioById(idUsuario);
+        if (usuarioOptional.isEmpty()) {
+            throw new IdInvalidoException(idUsuario.toString());
+        }
+        return usuarioOptional.get();
+    }
+
+    public void atualizarUsuarioNaBaseDeDados(Usuario usuario) {
+        this.repository.save(usuario);
+    }
+
 }

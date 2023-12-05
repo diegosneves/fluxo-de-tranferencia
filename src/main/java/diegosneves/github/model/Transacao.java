@@ -34,4 +34,7 @@ public class Transacao {
     @Column(name = "data_transacao", nullable = false)
     private LocalDateTime dataTransacao;
 
+    @Column(name = "hash_transacao", nullable = false)
+    private String hashTransacao;
+
 }

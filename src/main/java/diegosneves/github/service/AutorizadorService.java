@@ -1,6 +1,7 @@
 package diegosneves.github.service;
 
 import diegosneves.github.adapter.ServicoAutorizadorAdapter;
+import diegosneves.github.enums.HashEncoder;
 import diegosneves.github.exception.AutorizacaoTransacaoException;
 import diegosneves.github.exception.ServicoAutorizadorException;
 import diegosneves.github.model.Transacao;
@@ -26,6 +27,11 @@ public class AutorizadorService {
             throw new AutorizacaoTransacaoException(transacao.getValorTransacao().toString());
         }
         transacao.setDataTransacao(autorizacaoParaTransferencia.getDataDaAprovacao());
+        return gerarHashTransacao(transacao);
+    }
+
+    private Transacao gerarHashTransacao(Transacao transacao) {
+        transacao.setHashTransacao(HashEncoder.SHA_256.encode(transacao.getPagador().getCpf() + transacao.getRecebedor().getCpf() + transacao.getDataTransacao()));
         return transacao;
     }
 

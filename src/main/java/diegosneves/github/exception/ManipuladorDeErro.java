@@ -10,6 +10,7 @@ public enum ManipuladorDeErro {
     SALDO_INSUFICIENTE("O usuário de CPF [ %s ] não possui saldo suficiente.", HttpStatus.BAD_REQUEST),
     TRANSACAO_NAO_AUTORIZADA("Transação no valor de [ %s ] não Autorizada.", HttpStatus.BAD_REQUEST),
     FALHA_NO_MAPEAMENTO("Ocorreu um erro ao tentar mapear a classe [ %s ].", HttpStatus.INTERNAL_SERVER_ERROR),
+    FALHA_AO_GERAR_HASH("Ocorreu um erro ao tentar gerar o Hash de [ %s ].", HttpStatus.INTERNAL_SERVER_ERROR),
     CPF_DUPLICADO("O CPF [ %s ] já foi cadastrado na base de dados", HttpStatus.CONFLICT),
     EMAIL_DUPLICADO("O E-mail [ %s ] já foi cadastrado na base de dados", HttpStatus.CONFLICT),
     ERRO_API_AUTORIZADOR("Não foi possivel acessar a URL [ %s ] para autorizar a transação", HttpStatus.NOT_FOUND),

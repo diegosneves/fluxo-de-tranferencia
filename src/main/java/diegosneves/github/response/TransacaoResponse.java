@@ -18,5 +18,6 @@ public class TransacaoResponse {
     private Boolean notificacaoEnviadaRecebedor;
     private String statusDaTransacao;
     private LocalDateTime dataTransacao;
+    private String hashTransacao;
 
 }

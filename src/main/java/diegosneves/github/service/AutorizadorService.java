@@ -2,6 +2,7 @@ package diegosneves.github.service;
 
 import diegosneves.github.adapter.ServicoAutorizadorAdapter;
 import diegosneves.github.exception.AutorizacaoTransacaoException;
+import diegosneves.github.exception.ServicoAutorizadorException;
 import diegosneves.github.model.Transacao;
 import diegosneves.github.response.ServicoAutorizadorResponse;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class AutorizadorService {
         this.servicoAutorizadorAdapter = servicoAutorizadorAdapter;
     }
 
-    public Transacao autorizarTransacao(Transacao transacao) throws AutorizacaoTransacaoException {
+    public Transacao autorizarTransacao(Transacao transacao) throws AutorizacaoTransacaoException, ServicoAutorizadorException {
         ServicoAutorizadorResponse autorizacaoParaTransferencia = this.servicoAutorizadorAdapter.postAutorizacaoParaTransferencia(transacao);
 
         if (!AUTORIZADO.equals(autorizacaoParaTransferencia.getMessage()) || autorizacaoParaTransferencia.getDataDaAprovacao() == null) {

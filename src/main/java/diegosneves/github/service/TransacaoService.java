@@ -6,17 +6,20 @@ import diegosneves.github.exception.AutorizacaoTransacaoException;
 import diegosneves.github.exception.LojistaPagadorException;
 import diegosneves.github.exception.SaldoInsuficienteException;
 import diegosneves.github.mapper.MapearConstrutor;
+import diegosneves.github.mapper.TransacaoPagadorResponseMapper;
 import diegosneves.github.model.Transacao;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.TransacaoRepository;
 import diegosneves.github.request.TransacaoRequest;
 import diegosneves.github.response.ServicoAutorizadorResponse;
+import diegosneves.github.response.TransacaoPagadorResponse;
 import diegosneves.github.response.TransacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class TransacaoService {
@@ -83,5 +86,12 @@ public class TransacaoService {
             throw new SaldoInsuficienteException(pagador.getCpf());
         }
         return pagador;
+    }
+
+    public List<TransacaoPagadorResponse> obterTransacoesDebitadas(String cpf) {
+        TransacaoPagadorResponseMapper mapper = new TransacaoPagadorResponseMapper();
+        return this.repository.findTransacaoByPagador_Cpf(cpf).stream()
+                .map(transacao -> MapearConstrutor.construirNovoDe(TransacaoPagadorResponse.class, transacao, mapper))
+                .toList();
     }
 }

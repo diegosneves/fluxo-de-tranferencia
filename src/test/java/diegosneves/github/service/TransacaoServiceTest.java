@@ -7,6 +7,7 @@ import diegosneves.github.model.Transacao;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.TransacaoRepository;
 import diegosneves.github.request.TransacaoRequest;
+import diegosneves.github.response.TransacaoPagadorResponse;
 import diegosneves.github.response.TransacaoResponse;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -114,8 +116,97 @@ class TransacaoServiceTest {
         assertEquals(this.recebedor,this.transacaoCaptor.getValue().getRecebedor());
         assertEquals(BigDecimal.TEN, resultado.getValorTransacao());
         assertEquals("Autorizado", resultado.getStatusDaTransacao());
-        assertTrue(resultado.getNotificacaoEnviadaPagador());
-        assertTrue(resultado.getNotificacaoEnviadaRecebedor());
+        assertTrue(resultado.getNotificacoesEnviadas());
+        assertNotNull(resultado.getDataTransacao());
+    }
+
+    @Test
+    void quandoReceberUmaTransacaoRequestComTodosDadosOkMasNotificacaoAoPagadorNaoForEnviadaEntaoUmaTransacaoResponseComNotificacoesEnviadasFalsaDeveSerRetornada() {
+        this.transacao.setRecebedor(null);
+        this.transacao.setPagador(null);
+        this.transacao.setDataTransacao(LocalDateTime.now());
+
+        when(this.usuarioService.encontrarUsuarioPorId(1L)).thenReturn(this.pagador);
+        when(this.usuarioService.encontrarUsuarioPorId(2L)).thenReturn(this.recebedor);
+        when(this.autorizadorService.autorizarTransacao(any(Transacao.class))).thenReturn(this.transacao);
+        doNothing().when(this.usuarioService).atualizarUsuarioNaBaseDeDados(this.pagador);
+        doNothing().when(this.usuarioService).atualizarUsuarioNaBaseDeDados(this.recebedor);
+        when(this.repository.save(this.transacao)).thenReturn(this.transacao);
+        when(this.notificacaoService.enviarNotificacao(this.pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(this.recebedor.getCpf()))).thenReturn(false);
+        when(this.notificacaoService.enviarNotificacao(this.recebedor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(this.pagador.getCpf()))).thenReturn(true);
+
+        TransacaoResponse resultado = this.service.transferenciaFinanceira(this.request);
+
+        verify(this.autorizadorService, times(1)).autorizarTransacao(this.transacaoCaptor.capture());
+        verify(this.repository, times(1)).save(any(Transacao.class));
+        verify(this.usuarioService, times(2)).atualizarUsuarioNaBaseDeDados(any(Usuario.class));
+        verify(this.usuarioService, times(2)).encontrarUsuarioPorId(anyLong());
+
+        assertEquals(this.pagador,this.transacaoCaptor.getValue().getPagador());
+        assertEquals(this.recebedor,this.transacaoCaptor.getValue().getRecebedor());
+        assertEquals(BigDecimal.TEN, resultado.getValorTransacao());
+        assertEquals("Autorizado", resultado.getStatusDaTransacao());
+        assertFalse(resultado.getNotificacoesEnviadas());
+        assertNotNull(resultado.getDataTransacao());
+    }
+
+    @Test
+    void quandoReceberUmaTransacaoRequestComTodosDadosOkMasNotificacaoAoPagadorERecebedorNaoForEnviadaEntaoUmaTransacaoResponseComNotificacoesEnviadasFalsaDeveSerRetornada() {
+        this.transacao.setRecebedor(null);
+        this.transacao.setPagador(null);
+        this.transacao.setDataTransacao(LocalDateTime.now());
+
+        when(this.usuarioService.encontrarUsuarioPorId(1L)).thenReturn(this.pagador);
+        when(this.usuarioService.encontrarUsuarioPorId(2L)).thenReturn(this.recebedor);
+        when(this.autorizadorService.autorizarTransacao(any(Transacao.class))).thenReturn(this.transacao);
+        doNothing().when(this.usuarioService).atualizarUsuarioNaBaseDeDados(this.pagador);
+        doNothing().when(this.usuarioService).atualizarUsuarioNaBaseDeDados(this.recebedor);
+        when(this.repository.save(this.transacao)).thenReturn(this.transacao);
+        when(this.notificacaoService.enviarNotificacao(this.pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(this.recebedor.getCpf()))).thenReturn(false);
+        when(this.notificacaoService.enviarNotificacao(this.recebedor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(this.pagador.getCpf()))).thenReturn(false);
+
+        TransacaoResponse resultado = this.service.transferenciaFinanceira(this.request);
+
+        verify(this.autorizadorService, times(1)).autorizarTransacao(this.transacaoCaptor.capture());
+        verify(this.repository, times(1)).save(any(Transacao.class));
+        verify(this.usuarioService, times(2)).atualizarUsuarioNaBaseDeDados(any(Usuario.class));
+        verify(this.usuarioService, times(2)).encontrarUsuarioPorId(anyLong());
+
+        assertEquals(this.pagador,this.transacaoCaptor.getValue().getPagador());
+        assertEquals(this.recebedor,this.transacaoCaptor.getValue().getRecebedor());
+        assertEquals(BigDecimal.TEN, resultado.getValorTransacao());
+        assertEquals("Autorizado", resultado.getStatusDaTransacao());
+        assertFalse(resultado.getNotificacoesEnviadas());
+        assertNotNull(resultado.getDataTransacao());
+    }
+
+    @Test
+    void quandoReceberUmaTransacaoRequestComTodosDadosOkMasNotificacaoAoRecebedorNaoForEnviadaEntaoUmaTransacaoResponseComNotificacoesEnviadasFalsaDeveSerRetornada() {
+        this.transacao.setRecebedor(null);
+        this.transacao.setPagador(null);
+        this.transacao.setDataTransacao(LocalDateTime.now());
+
+        when(this.usuarioService.encontrarUsuarioPorId(1L)).thenReturn(this.pagador);
+        when(this.usuarioService.encontrarUsuarioPorId(2L)).thenReturn(this.recebedor);
+        when(this.autorizadorService.autorizarTransacao(any(Transacao.class))).thenReturn(this.transacao);
+        doNothing().when(this.usuarioService).atualizarUsuarioNaBaseDeDados(this.pagador);
+        doNothing().when(this.usuarioService).atualizarUsuarioNaBaseDeDados(this.recebedor);
+        when(this.repository.save(this.transacao)).thenReturn(this.transacao);
+        when(this.notificacaoService.enviarNotificacao(this.pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(this.recebedor.getCpf()))).thenReturn(true);
+        when(this.notificacaoService.enviarNotificacao(this.recebedor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(this.pagador.getCpf()))).thenReturn(false);
+
+        TransacaoResponse resultado = this.service.transferenciaFinanceira(this.request);
+
+        verify(this.autorizadorService, times(1)).autorizarTransacao(this.transacaoCaptor.capture());
+        verify(this.repository, times(1)).save(any(Transacao.class));
+        verify(this.usuarioService, times(2)).atualizarUsuarioNaBaseDeDados(any(Usuario.class));
+        verify(this.usuarioService, times(2)).encontrarUsuarioPorId(anyLong());
+
+        assertEquals(this.pagador,this.transacaoCaptor.getValue().getPagador());
+        assertEquals(this.recebedor,this.transacaoCaptor.getValue().getRecebedor());
+        assertEquals(BigDecimal.TEN, resultado.getValorTransacao());
+        assertEquals("Autorizado", resultado.getStatusDaTransacao());
+        assertFalse(resultado.getNotificacoesEnviadas());
         assertNotNull(resultado.getDataTransacao());
     }
 
@@ -194,8 +285,6 @@ class TransacaoServiceTest {
     @Test
     @SneakyThrows
     void quandoAutorizarTransacaoReceberParametrosValidosEntaoUmaTransacaoComDataTransacaoDiferenteDeNuloDeveSerRetornada() {
-//        this.transacao.setRecebedor(null);
-//        this.transacao.setPagador(null);
         this.transacao.setDataTransacao(LocalDateTime.now());
 
         when(this.autorizadorService.autorizarTransacao(any(Transacao.class))).thenReturn(this.transacao);
@@ -260,6 +349,39 @@ class TransacaoServiceTest {
 
         assertEquals(saldoRecebedor, resultado.getRecebedor().getSaldo());
         assertEquals(saldoPagador, resultado.getPagador().getSaldo());
+    }
+
+    @Test
+    void quandoObterTransacoesDebitadasReceberUmCpfValidoEntaoUmaListaDeTransacaoPagadorResponseDeveSerRetornada(){
+        String cpf = "32212200650";
+        this.transacao.setHashTransacao(AutorizadorServiceTest.SHA_256_TEST);
+        LocalDateTime dataTransacao = LocalDateTime.parse(AutorizadorServiceTest.DATA_TRANSACAO_TESTE);
+        this.transacao.setDataTransacao(dataTransacao);
+        when(this.repository.findTransacaoByPagador_Cpf(cpf)).thenReturn(List.of(this.transacao));
+
+        List<TransacaoPagadorResponse> responses = this.service.obterTransacoesDebitadas(cpf);
+        TransacaoPagadorResponse response = responses.stream().findFirst().orElse(new TransacaoPagadorResponse());
+
+        verify(this.repository, times(1)).findTransacaoByPagador_Cpf(cpf);
+
+        assertFalse(responses.isEmpty());
+        assertEquals(AutorizadorServiceTest.SHA_256_TEST, response.getHashTransacao());
+        assertEquals(this.recebedor.getCpf(), response.getDebitadoPara().getCpf());
+        assertEquals(this.recebedor.getNomeCompleto(), response.getDebitadoPara().getNomeCompleto());
+    }
+
+    @Test
+    void quandoObterTransacoesDebitadasReceberUmCpfNaoCadastradoOuQueNaoTenhaTransacoesDebitadasEntaoUmaListaVaziaDeveSerRetornada(){
+        when(this.repository.findTransacaoByPagador_Cpf(anyString())).thenReturn(List.of());
+
+        List<TransacaoPagadorResponse> responses = this.service.obterTransacoesDebitadas(anyString());
+        TransacaoPagadorResponse response = responses.stream().findFirst().orElse(new TransacaoPagadorResponse());
+
+        verify(this.repository, times(1)).findTransacaoByPagador_Cpf(anyString());
+
+        assertTrue(responses.isEmpty());
+        assertNull(response.getHashTransacao());
+        assertNull(response.getDebitadoPara());
     }
 
 }

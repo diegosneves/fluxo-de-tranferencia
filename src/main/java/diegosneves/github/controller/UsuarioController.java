@@ -31,6 +31,10 @@ public class UsuarioController {
 
     @GetMapping("/todos")
     @Operation(summary = "Retornar todos os usuarios", tags = "Usuários")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista com todos os usuários cadastrados", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No caso de não haver nenhum usuário cadastrado, nada é retornado.", content = @Content),
+    })
     public ResponseEntity<List<UsuarioResponse>> obterTodosUsuarios() {
         List<UsuarioResponse> usuarioResponses = this.service.obterTodosUsuarios();
 
@@ -43,6 +47,10 @@ public class UsuarioController {
 
     @GetMapping("/debitos/{cpf}")
     @Operation(summary = "Retornar todas as transações debitadas", tags = "Usuários")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de todas as transações debitadas pelo CPF informado", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido realizada, nada é retornado.", content = @Content),
+    })
     public ResponseEntity<List<TransacaoPagadorResponse>> obterMovimentacoesDebitadas(@RequestParam(name = "cpf") String cpf) {
         List<TransacaoPagadorResponse> responses = this.transacaoService.obterTransacoesDebitadas(cpf);
 

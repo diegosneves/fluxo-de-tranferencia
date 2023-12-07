@@ -11,14 +11,12 @@ import diegosneves.github.model.Transacao;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.TransacaoRepository;
 import diegosneves.github.request.TransacaoRequest;
-import diegosneves.github.response.ServicoAutorizadorResponse;
 import diegosneves.github.response.TransacaoPagadorResponse;
 import diegosneves.github.response.TransacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,8 +45,10 @@ public class TransacaoService {
         TransacaoResponse response = MapearConstrutor.construirNovoDe(TransacaoResponse.class, this.realizarTranferenciaFinanceira(pagador, recebdor, request.getValor()));
         response.setStatusDaTransacao(AUTORIZADO);
 
-        response.setNotificacaoEnviadaPagador(this.enviarNotificacao(pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(recebdor.getCpf())));
-        response.setNotificacaoEnviadaRecebedor(this.enviarNotificacao(recebdor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(pagador.getCpf())));
+        boolean notificacaoPagador = this.enviarNotificacao(pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(recebdor.getCpf()));
+        boolean notificacaoRecebedor = this.enviarNotificacao(recebdor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(pagador.getCpf()));
+
+        response.setNotificacoesEnviadas(notificacaoPagador && notificacaoRecebedor);
 
         return response;
     }

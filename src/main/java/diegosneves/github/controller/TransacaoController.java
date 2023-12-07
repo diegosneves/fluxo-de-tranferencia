@@ -31,7 +31,15 @@ public class TransacaoController {
     @Transactional
     @Operation(tags = "Transação", summary = "Realiza uma transferência financeira entre usuários")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Transferência realizada com sucesso.", content = @Content)
+            @ApiResponse(responseCode = "200", description = "Transferência realizada com sucesso.", content = @Content),
+            @ApiResponse(responseCode = "404", description = """
+                    ID do usuário informado, não existe. |\s
+                    Quando há uma falha ao tentar se conectar a API externa para autorizar a transação. |\s
+                    Quando há uma falha ao tentar se conectar a API externa utilizada para notificar os usuários.""", content = @Content),
+            @ApiResponse(responseCode = "400", description = """
+                    Transferência não autorizada. |\s
+                    Quando o usuário pagador informado é do tipo Lojista. |\s
+                    Quando o usuário pagador não possui saldo suficiente.""", content = @Content)
     })
     public ResponseEntity<TransacaoResponse> realizarTransferencia(@RequestBody TransacaoRequest request) {
         TransacaoResponse response = this.service.transferenciaFinanceira(request);

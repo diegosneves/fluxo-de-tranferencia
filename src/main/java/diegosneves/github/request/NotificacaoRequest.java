@@ -2,6 +2,9 @@ package diegosneves.github.request;
 
 import lombok.*;
 
+/**
+ * Esta classe representa uma solicitação de notificação.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

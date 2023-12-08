@@ -5,6 +5,9 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
+/**
+ * Representa a resposta de um {@link diegosneves.github.model.Usuario usuário}.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

@@ -1,6 +1,7 @@
 package diegosneves.github.response;
 
 
+import diegosneves.github.dto.UsuarioDTO;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -11,11 +12,10 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @Setter
-public class TransacaoResponse {
+public class TransacaoPagadorResponse {
 
+    private UsuarioDTO debitadoPara;
     private BigDecimal valorTransacao;
-    private Boolean notificacoesEnviadas;
-    private String statusDaTransacao;
     private LocalDateTime dataTransacao;
     private String hashTransacao;
 

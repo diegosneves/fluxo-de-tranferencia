@@ -8,6 +8,7 @@ import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.TransacaoRepository;
 import diegosneves.github.request.TransacaoRequest;
 import diegosneves.github.response.TransacaoPagadorResponse;
+import diegosneves.github.response.TransacaoRecebedorResponse;
 import diegosneves.github.response.TransacaoResponse;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -233,10 +234,10 @@ class TransacaoServiceTest {
     void quandoEnviarNotificaoReceberEmailAndMensagemEntaoTrueDeverRetornadoEmCasoDeSucesso() {
         when(this.notificacaoService.enviarNotificacao(anyString(), anyString())).thenReturn(true);
 
-        Method method = this.service.getClass().getDeclaredMethod("enviarNotificacao", String.class, String.class);
+        Method method = this.service.getClass().getDeclaredMethod("enviarNotificacaoDeTransferencia", Usuario.class, Usuario.class, TipoDeTransacao.class);
         method.setAccessible(true);
 
-        Boolean retorno = (Boolean) method.invoke(this.service, "email", "mensagem");
+        Boolean retorno = (Boolean) method.invoke(this.service, this.pagador, this.recebedor, TipoDeTransacao.ENVIADA);
 
         assertTrue(retorno);
     }
@@ -263,7 +264,7 @@ class TransacaoServiceTest {
         InvocationTargetException actual =  assertThrows(InvocationTargetException.class, () -> method.invoke(this.service, this.pagador, BigDecimal.TEN));
         Throwable realException = actual.getTargetException();
 
-        assertTrue(realException instanceof LojistaPagadorException);
+        assertInstanceOf(LojistaPagadorException.class, realException);
         assertEquals(ManipuladorDeErro.LOJISTA_PAGADOR.mensagemDeErro(this.pagador.getCpf()), realException.getMessage());
     }
 
@@ -278,7 +279,7 @@ class TransacaoServiceTest {
         InvocationTargetException actual =  assertThrows(InvocationTargetException.class, () -> method.invoke(this.service, this.pagador, BigDecimal.TEN));
         Throwable realException = actual.getTargetException();
 
-        assertTrue(realException instanceof SaldoInsuficienteException);
+        assertInstanceOf(SaldoInsuficienteException.class, realException);
         assertEquals(ManipuladorDeErro.SALDO_INSUFICIENTE.mensagemDeErro(this.pagador.getCpf()), realException.getMessage());
     }
 
@@ -312,7 +313,7 @@ class TransacaoServiceTest {
 
         InvocationTargetException exception = assertThrows(InvocationTargetException.class, () -> method.invoke(this.service, this.pagador, this.recebedor, BigDecimal.TEN));
 
-        assertTrue(exception.getTargetException() instanceof AutorizacaoTransacaoException);
+        assertInstanceOf(AutorizacaoTransacaoException.class, exception.getTargetException());
         assertEquals(ManipuladorDeErro.TRANSACAO_NAO_AUTORIZADA.mensagemDeErro(valor), exception.getTargetException().getMessage());
     }
 
@@ -327,7 +328,7 @@ class TransacaoServiceTest {
 
         InvocationTargetException exception = assertThrows(InvocationTargetException.class, () -> method.invoke(this.service, this.pagador, this.recebedor, BigDecimal.TEN));
 
-        assertTrue(exception.getTargetException() instanceof ServicoAutorizadorException);
+        assertInstanceOf(ServicoAutorizadorException.class, exception.getTargetException());
         assertEquals(ManipuladorDeErro.ERRO_API_AUTORIZADOR.mensagemDeErro(url), exception.getTargetException().getMessage());
     }
 
@@ -382,6 +383,62 @@ class TransacaoServiceTest {
         assertTrue(responses.isEmpty());
         assertNull(response.getHashTransacao());
         assertNull(response.getDebitadoPara());
+    }
+
+    @Test
+    void quandoObterTransacoesCreditadasReceberUmCpfValidoEntaoUmaListaDeTransacaoRecebedorResponseDeveSerRetornada(){
+        String cpf = "44914562839";
+        this.transacao.setHashTransacao(AutorizadorServiceTest.SHA_256_TEST);
+        LocalDateTime dataTransacao = LocalDateTime.parse(AutorizadorServiceTest.DATA_TRANSACAO_TESTE);
+        this.transacao.setDataTransacao(dataTransacao);
+        when(this.repository.findTransacaoByRecebedor_Cpf(cpf)).thenReturn(List.of(this.transacao));
+
+        List<TransacaoRecebedorResponse> responses = this.service.obterTransacoesCreditadas(cpf);
+        TransacaoRecebedorResponse response = responses.stream().findFirst().orElse(new TransacaoRecebedorResponse());
+
+        verify(this.repository, times(1)).findTransacaoByRecebedor_Cpf(cpf);
+
+        assertFalse(responses.isEmpty());
+        assertEquals(AutorizadorServiceTest.SHA_256_TEST, response.getHashTransacao());
+        assertEquals(this.pagador.getCpf(), response.getCreditadoDe().getCpf());
+        assertEquals(this.pagador.getNomeCompleto(), response.getCreditadoDe().getNomeCompleto());
+    }
+
+    @Test
+    void quandoObterTransacoesCreditadasReceberUmCpfNaoCadastradoOuQueNaoTenhaTransacoesCreditadaEntaoUmaListaVaziaDeveSerRetornada(){
+        when(this.repository.findTransacaoByRecebedor_Cpf(anyString())).thenReturn(List.of());
+
+        List<TransacaoRecebedorResponse> responses = this.service.obterTransacoesCreditadas(anyString());
+        TransacaoRecebedorResponse response = responses.stream().findFirst().orElse(new TransacaoRecebedorResponse());
+
+        verify(this.repository, times(1)).findTransacaoByRecebedor_Cpf(anyString());
+
+        assertTrue(responses.isEmpty());
+        assertNull(response.getHashTransacao());
+        assertNull(response.getCreditadoDe());
+    }
+
+    @Test
+    @SneakyThrows
+    void quandoConstruirRespostaTransacaoReceberInformacoesValidasEntaoUmaTransacaoResponseDeveSerRetornada() {
+        LocalDateTime dataEsperada = LocalDateTime.parse(AutorizadorServiceTest.DATA_TRANSACAO_TESTE);
+        this.transacao.setDataTransacao(dataEsperada);
+        this.transacao.setHashTransacao(AutorizadorServiceTest.SHA_256_TEST);
+        when(this.autorizadorService.autorizarTransacao(any(Transacao.class))).thenReturn(this.transacao);
+        when(this.repository.save(any(Transacao.class))).thenReturn(this.transacao);
+
+        Method method = this.service.getClass().getDeclaredMethod("construirRespostaTransacao", Usuario.class, Usuario.class, BigDecimal.class, Boolean.class);
+        method.setAccessible(true);
+
+        TransacaoResponse actual = (TransacaoResponse) method.invoke(this.service, this.pagador, this.recebedor, BigDecimal.TEN, true);
+
+        verify(this.usuarioService, times(2)).atualizarUsuarioNaBaseDeDados(any(Usuario.class));
+        verify(this.repository, times(1)).save(any(Transacao.class));
+
+        assertEquals(dataEsperada, actual.getDataTransacao());
+        assertEquals(AutorizadorServiceTest.AUTORIZADO, actual.getStatusDaTransacao());
+        assertEquals(BigDecimal.TEN, actual.getValorTransacao());
+        assertTrue(actual.getNotificacoesEnviadas());
     }
 
 }

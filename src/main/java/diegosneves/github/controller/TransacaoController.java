@@ -1,5 +1,9 @@
 package diegosneves.github.controller;
 
+import diegosneves.github.exception.AutorizacaoTransacaoException;
+import diegosneves.github.exception.IdInvalidoException;
+import diegosneves.github.exception.LojistaPagadorException;
+import diegosneves.github.exception.SaldoInsuficienteException;
 import diegosneves.github.request.TransacaoRequest;
 import diegosneves.github.response.TransacaoResponse;
 import diegosneves.github.service.TransacaoService;
@@ -15,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * A classe do controlador para lidar com transações.
+ */
 @RestController
 @RequestMapping("/transacao")
 public class TransacaoController {
@@ -27,6 +34,18 @@ public class TransacaoController {
         this.service = service;
     }
 
+    /**
+     * Realiza uma transferência financeira entre usuários.
+     *
+     * @param request O objeto contendo as informações da transferência.
+     *                Deve conter o valor da transferência, o ID do {@link diegosneves.github.model.Usuario pagador} e o ID do {@link diegosneves.github.model.Usuario recebedor}.
+     * @return Um objeto ResponseEntity contendo a resposta da transferência.
+     *         O corpo da resposta é um objeto {@link TransacaoResponse}, que contém informações sobre a {@link diegosneves.github.model.Transacao transação} realizada.
+     * @throws LojistaPagadorException     Caso o usuário pagador seja do tipo Lojista.
+     * @throws SaldoInsuficienteException  Caso o usuário pagador não possua saldo suficiente.
+     * @throws IdInvalidoException         Caso o ID do usuário pagador ou do usuário recebedor seja inválido.
+     * @throws AutorizacaoTransacaoException  Caso ocorra uma falha na autorização da transação.
+     */
     @PostMapping("/transferencia")
     @Transactional
     @Operation(tags = "Transação", summary = "Realiza uma transferência financeira entre usuários")

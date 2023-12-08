@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ *A interface UsuarioRepository fornece métodos para acessar e manipular entidades {@link Usuario}
+ *no banco de dados.
+ */
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 

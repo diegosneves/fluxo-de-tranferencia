@@ -1,5 +1,8 @@
 package diegosneves.github.exception;
 
+/**
+ * Exceção lançada quando um ID inválido é fornecido.
+ */
 public class IdInvalidoException extends RuntimeException {
 
     public static final ManipuladorDeErro ERRO = ManipuladorDeErro.ID_USUARIO_NAO_ENCONTRADO;

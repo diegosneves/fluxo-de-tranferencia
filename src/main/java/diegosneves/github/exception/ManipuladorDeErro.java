@@ -2,6 +2,10 @@ package diegosneves.github.exception;
 
 import org.springframework.http.HttpStatus;
 
+/**
+ * Este enum representa um conjunto de mensagens de erro e códigos de status HTTP correspondentes
+ * que pode ser usado para lidar com erros em um sistema.
+ */
 public enum ManipuladorDeErro {
 
     CPF_USUARIO_NAO_ENCONTRADO("O usuário de CPF [ %s ] não existe.", HttpStatus.NOT_FOUND),
@@ -25,10 +29,21 @@ public enum ManipuladorDeErro {
         this.statusCode = statusCode;
     }
 
+    /**
+     * Retorna uma mensagem de erro formatada.
+     *
+     * @param valor o valor a ser inserido na mensagem de erro
+     * @return a mensagem de erro formatada
+     */
     public String mensagemDeErro(String valor) {
         return String.format(this.mensagem, valor);
     }
 
+    /**
+     * Recupera o código de status associado à instância atual.
+     *
+     * @return o código de status
+     */
     public HttpStatus getStatusCode(){
         return this.statusCode;
     }

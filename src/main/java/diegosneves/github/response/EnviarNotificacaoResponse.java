@@ -2,6 +2,9 @@ package diegosneves.github.response;
 
 import lombok.*;
 
+/**
+ * Esta classe representa a resposta do envio de uma notificação.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

@@ -11,5 +11,7 @@ public interface TransacaoRepository extends JpaRepository<Transacao, Long> {
 
     List<Transacao> findTransacaoByPagador_Cpf(String cpf);
 
+    List<Transacao> findTransacaoByRecebedor_Cpf(String cpf);
+
 
 }

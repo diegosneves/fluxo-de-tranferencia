@@ -7,11 +7,13 @@ import diegosneves.github.exception.LojistaPagadorException;
 import diegosneves.github.exception.SaldoInsuficienteException;
 import diegosneves.github.mapper.MapearConstrutor;
 import diegosneves.github.mapper.TransacaoPagadorResponseMapper;
+import diegosneves.github.mapper.TransacaoRecebedorResponseMapper;
 import diegosneves.github.model.Transacao;
 import diegosneves.github.model.Usuario;
 import diegosneves.github.repository.TransacaoRepository;
 import diegosneves.github.request.TransacaoRequest;
 import diegosneves.github.response.TransacaoPagadorResponse;
+import diegosneves.github.response.TransacaoRecebedorResponse;
 import diegosneves.github.response.TransacaoResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,22 +41,25 @@ public class TransacaoService {
 
 
     public TransacaoResponse transferenciaFinanceira(TransacaoRequest request) {
-        Usuario recebdor = this.usuarioService.encontrarUsuarioPorId(request.getIdRecebedor());
+        Usuario recebedor = this.usuarioService.encontrarUsuarioPorId(request.getIdRecebedor());
         Usuario pagador = this.validarUsuarioPagador(this.usuarioService.encontrarUsuarioPorId(request.getIdPagador()), request.getValor());
 
-        TransacaoResponse response = MapearConstrutor.construirNovoDe(TransacaoResponse.class, this.realizarTranferenciaFinanceira(pagador, recebdor, request.getValor()));
-        response.setStatusDaTransacao(AUTORIZADO);
+        boolean notificacaoPagadorEnviada = this.enviarNotificacaoDeTransferencia(pagador, recebedor, TipoDeTransacao.ENVIADA);
+        boolean notificacaoRecebedorEnviada = this.enviarNotificacaoDeTransferencia(recebedor, pagador, TipoDeTransacao.RECEBIDA);
 
-        boolean notificacaoPagador = this.enviarNotificacao(pagador.getEmail(), TipoDeTransacao.ENVIADA.enviar(recebdor.getCpf()));
-        boolean notificacaoRecebedor = this.enviarNotificacao(recebdor.getEmail(), TipoDeTransacao.RECEBIDA.enviar(pagador.getCpf()));
-
-        response.setNotificacoesEnviadas(notificacaoPagador && notificacaoRecebedor);
-
-        return response;
+        return this.construirRespostaTransacao(pagador, recebedor, request.getValor(), notificacaoPagadorEnviada && notificacaoRecebedorEnviada);
     }
 
-    private boolean enviarNotificacao(String email, String mensagem) {
-        return this.notificacaoService.enviarNotificacao(email, mensagem);
+    private boolean enviarNotificacaoDeTransferencia(Usuario destinatario, Usuario participanteTransferencia, TipoDeTransacao tipo) {
+        return this.notificacaoService.enviarNotificacao(destinatario.getEmail(), tipo.enviar(participanteTransferencia.getCpf()));
+    }
+
+    private TransacaoResponse construirRespostaTransacao(Usuario pagador, Usuario recebedor, BigDecimal valor, Boolean notificacoesEnviadas) {
+        Transacao transacao = this.realizarTranferenciaFinanceira(pagador, recebedor, valor);
+        TransacaoResponse response = MapearConstrutor.construirNovoDe(TransacaoResponse.class, transacao);
+        response.setStatusDaTransacao(AUTORIZADO);
+        response.setNotificacoesEnviadas(notificacoesEnviadas);
+        return response;
     }
 
     private Transacao realizarTranferenciaFinanceira(Usuario pagador, Usuario recebdor, BigDecimal valor) {
@@ -93,5 +98,11 @@ public class TransacaoService {
         return this.repository.findTransacaoByPagador_Cpf(cpf).stream()
                 .map(transacao -> MapearConstrutor.construirNovoDe(TransacaoPagadorResponse.class, transacao, mapper))
                 .toList();
+    }
+
+    public List<TransacaoRecebedorResponse> obterTransacoesCreditadas(String cpf) {
+        TransacaoRecebedorResponseMapper mapper = new TransacaoRecebedorResponseMapper();
+        return this.repository.findTransacaoByRecebedor_Cpf(cpf).stream()
+                .map(transacao -> MapearConstrutor.construirNovoDe(TransacaoRecebedorResponse.class, transacao, mapper)).toList();
     }
 }

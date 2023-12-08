@@ -2,6 +2,7 @@ package diegosneves.github.controller;
 
 import diegosneves.github.request.UsuarioRequest;
 import diegosneves.github.response.TransacaoPagadorResponse;
+import diegosneves.github.response.TransacaoRecebedorResponse;
 import diegosneves.github.response.UsuarioResponse;
 import diegosneves.github.service.TransacaoService;
 import diegosneves.github.service.UsuarioService;
@@ -29,6 +30,12 @@ public class UsuarioController {
         this.transacaoService = transacaoService;
     }
 
+    /**
+     * Método para obter todos os {@link diegosneves.github.model.Usuario usuários}.
+     * <p>
+     * Este método é responsável por retornar todos os {@link diegosneves.github.model.Usuario usuários} cadastrados.<br>
+     * @return {@link ResponseEntity} com uma lista de {@link UsuarioResponse} se existirem {@link diegosneves.github.model.Usuario usuários} cadastrados, caso contrário, retorna {@link HttpStatus#NO_CONTENT status 204 - No Content}
+     */
     @GetMapping("/todos")
     @Operation(summary = "Retornar todos os usuarios", tags = "Usuários")
     @ApiResponses(value = {
@@ -45,6 +52,12 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioResponses);
     }
 
+    /**
+     * Obter as movimentações debitadas de um {@link diegosneves.github.model.Usuario usuário} pelo CPF.
+     *
+     * @param cpf O CPF do {@link diegosneves.github.model.Usuario usuário}.
+     * @return {@link ResponseEntity} contendo a lista de {@link TransacaoPagadorResponse} com todas as transações debitadas.
+     */
     @GetMapping("/debitos/{cpf}")
     @Operation(summary = "Retornar todas as transações debitadas", tags = "Usuários")
     @ApiResponses(value = {
@@ -60,6 +73,33 @@ public class UsuarioController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * Obter as movimentações creditadas de um {@link diegosneves.github.model.Usuario usuário} pelo CPF.
+     *
+     * @param cpf O CPF do {@link diegosneves.github.model.Usuario usuário}.
+     * @return {@link ResponseEntity} contendo a lista de {@link TransacaoRecebedorResponse} com todas as transações creditadas.
+     */
+    @GetMapping("/creditos/{cpf}")
+    @Operation(summary = "Retornar todas as transações creditadas", tags = "Usuários")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de todas as transações creditadas pelo CPF informado", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido realizada, nada é retornado.", content = @Content),
+    })
+    public ResponseEntity<List<TransacaoRecebedorResponse>> obterMovimentacoesCreditadas(@RequestParam(name = "cpf") String cpf) {
+        List<TransacaoRecebedorResponse> responses = this.transacaoService.obterTransacoesCreditadas(cpf);
+
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
+    /**
+     * CadastroDeUsuario é um método usado para registrar um novo {@link diegosneves.github.model.Usuario usuário} no sistema.
+     *
+     * @param request O objeto UsuarioRequest contendo os dados do usuário.
+     * @return {@link ResponseEntity<>}<{@link UsuarioResponse}> O ResponseEntity contendo o objeto {@link UsuarioResponse} criado.
+     */
     @PostMapping("/cadastro")
     @Operation(tags = "Usuários", summary = "Cadastrar um novo usuário")
     @ApiResponses(value = {

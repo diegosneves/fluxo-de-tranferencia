@@ -58,11 +58,11 @@ public class UsuarioController {
      * @param cpf O CPF do {@link diegosneves.github.model.Usuario usuário}.
      * @return {@link ResponseEntity} contendo a lista de {@link TransacaoPagadorResponse} com todas as transações debitadas.
      */
-    @GetMapping("/debitos/{cpf}")
-    @Operation(summary = "Retornar todas as transações debitadas", tags = "Usuários")
+    @GetMapping("/transacoes/enviadas/{cpf}")
+    @Operation(summary = "Retorna todas as transações enviadas pelo CPF especificado", tags = "Usuários")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de todas as transações debitadas pelo CPF informado", content = @Content),
-            @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido realizada, nada é retornado.", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Lista de todas as transações enviadas pelo CPF informado", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido enviada pelo CPF especificado, nada é retornado.", content = @Content),
     })
     public ResponseEntity<List<TransacaoPagadorResponse>> obterMovimentacoesDebitadas(@RequestParam(name = "cpf") String cpf) {
         List<TransacaoPagadorResponse> responses = this.transacaoService.obterTransacoesDebitadas(cpf);
@@ -79,11 +79,11 @@ public class UsuarioController {
      * @param cpf O CPF do {@link diegosneves.github.model.Usuario usuário}.
      * @return {@link ResponseEntity} contendo a lista de {@link TransacaoRecebedorResponse} com todas as transações creditadas.
      */
-    @GetMapping("/creditos/{cpf}")
-    @Operation(summary = "Retornar todas as transações creditadas", tags = "Usuários")
+    @GetMapping("/transacoes/recebidas/{cpf}")
+    @Operation(summary = "Retorna todas as transações recebidas pelo CPF especificado", tags = "Usuários")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de todas as transações creditadas pelo CPF informado", content = @Content),
-            @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido realizada, nada é retornado.", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Lista de todas as transações recebidas pelo CPF informado", content = @Content),
+            @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido recebida pelo CPF especificado, nada é retornado.", content = @Content),
     })
     public ResponseEntity<List<TransacaoRecebedorResponse>> obterMovimentacoesCreditadas(@RequestParam(name = "cpf") String cpf) {
         List<TransacaoRecebedorResponse> responses = this.transacaoService.obterTransacoesCreditadas(cpf);

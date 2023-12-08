@@ -7,6 +7,9 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Esta classe representa a resposta de uma {@link diegosneves.github.model.Transacao transação} recebida pelo {@link diegosneves.github.model.Usuario destinatário}.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

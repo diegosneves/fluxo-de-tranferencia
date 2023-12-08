@@ -6,6 +6,11 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * A classe Transacao representa uma transação financeira entre dois {@link Usuario usuários}.
+ * Contém informações sobre o ID da transação, {@link Usuario pagador}, {@link Usuario beneficiário}, valor da transação,
+ * data da transação e {@link diegosneves.github.enums.HashEncoder hash} da transação.
+ */
 @Entity(name = "transacoes")
 @Table(name = "transacoes")
 @AllArgsConstructor

@@ -4,6 +4,9 @@ import diegosneves.github.dto.UsuarioDTO;
 import diegosneves.github.model.Transacao;
 import diegosneves.github.response.TransacaoRecebedorResponse;
 
+/**
+ * A classe {@link TransacaoRecebedorResponseMapper} implementa a interface {@link EstrategiaDeMapeamento} para mapear objetos {@link Transacao} para objetos {@link TransacaoRecebedorResponse}.
+ */
 public class TransacaoRecebedorResponseMapper implements EstrategiaDeMapeamento<TransacaoRecebedorResponse, Transacao> {
     @Override
     public TransacaoRecebedorResponse mapear(Transacao origem) {

@@ -6,6 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Este enum representa um conjunto de algoritmos de codificação hash que podem ser usados para codificar um valor de string.
+ */
 public enum HashEncoder {
 
     MD5("MD5"),
@@ -17,6 +20,13 @@ public enum HashEncoder {
         this.algoritimo = algoritimo;
     }
 
+    /**
+     * Codifica um determinado valor usando um algoritmo de codificação hash especificado.
+     *
+     * @param valor o valor a ser codificado
+     * @return o valor codificado como uma string hexadecimal
+     * @throws HashEncoderException se ocorrer um erro durante o processo de codificação
+     */
     public String encode(String valor) {
         try {
             MessageDigest encodeAlgorithm = MessageDigest.getInstance(this.algoritimo);

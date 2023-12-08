@@ -1,5 +1,8 @@
 package diegosneves.github.enums;
 
+/**
+ * Enum representando o tipo de transação.
+ */
 public enum TipoDeTransacao {
 
     ENVIADA("Transação enviada para o CPF [ %s ]!"),

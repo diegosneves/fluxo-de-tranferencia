@@ -19,5 +19,9 @@ RUN mvn package -DskipTests
 # Expõe a porta 8080 (ou a porta que a sua aplicação Java está configurada para usar)
 EXPOSE 8080
 
+## Define variáveis de ambiente para teste
+#ENV DB_HOST=sql_transferencia_db
+#ENV DB_PORT=3306
+
 # Comando para iniciar a aplicação quando o contêiner for iniciado
 CMD ["java", "-jar", "target/fluxo-tranferencia.jar"]

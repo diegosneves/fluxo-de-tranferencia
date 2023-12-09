@@ -64,7 +64,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista de todas as transações enviadas pelo CPF informado", content = @Content),
             @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido enviada pelo CPF especificado, nada é retornado.", content = @Content),
     })
-    public ResponseEntity<List<TransacaoPagadorResponse>> obterMovimentacoesDebitadas(@RequestParam(name = "cpf") String cpf) {
+    public ResponseEntity<List<TransacaoPagadorResponse>> obterMovimentacoesDebitadas(@PathVariable(name = "cpf") String cpf) {
         List<TransacaoPagadorResponse> responses = this.transacaoService.obterTransacoesDebitadas(cpf);
 
         if (responses.isEmpty()) {
@@ -85,7 +85,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista de todas as transações recebidas pelo CPF informado", content = @Content),
             @ApiResponse(responseCode = "204", description = "No caso de nenhuma transação ter sido recebida pelo CPF especificado, nada é retornado.", content = @Content),
     })
-    public ResponseEntity<List<TransacaoRecebedorResponse>> obterMovimentacoesCreditadas(@RequestParam(name = "cpf") String cpf) {
+    public ResponseEntity<List<TransacaoRecebedorResponse>> obterMovimentacoesCreditadas(@PathVariable(name = "cpf") String cpf) {
         List<TransacaoRecebedorResponse> responses = this.transacaoService.obterTransacoesCreditadas(cpf);
 
         if (responses.isEmpty()) {

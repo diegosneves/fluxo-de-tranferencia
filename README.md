@@ -5,10 +5,6 @@
 
 ---
 
-O aplicativo estará disponível no seguinte URL após a implantação bem-sucedida:
-
-[API](http://localhost:8080/)
-
 ## Swagger
 
 - [Swagger - Local](http://localhost:8080/swagger-ui/index.html)

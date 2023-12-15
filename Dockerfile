@@ -24,4 +24,11 @@ EXPOSE 8080
 #ENV DB_PORT=3306
 
 # Comando para iniciar a aplicação quando o contêiner for iniciado
-CMD ["java", "-jar", "target/fluxo-tranferencia.jar"]
+#CMD ["java", "-jar", "target/fluxo-tranferencia.jar"]
+
+ENV DOCKERIZE_VERSION=v0.7.0
+
+RUN apk update --no-cache \
+    && apk add --no-cache wget openssl \
+    && wget -O - https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz | tar xzf - -C /usr/local/bin \
+    && apk del wget

@@ -44,6 +44,7 @@ services:
     environment:
       - DB_HOST=sql_transferencia_db
       - DB_PORT=3306
+    entrypoint: sh -c "dockerize -wait tcp://sql_transferencia_db:3306 -timeout 60s && java -jar target/fluxo-tranferencia.jar"
 
 volumes:
   fluxo-db:
@@ -51,6 +52,7 @@ volumes:
 networks:
   fluxo-bridge:
     driver: bridge
+
 ```
 
 Lembre-se de estar no diretório onde o seu arquivo `docker-compose.yaml` está localizado antes de executar esses comandos.

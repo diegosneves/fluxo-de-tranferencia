@@ -67,9 +67,15 @@ Se quiser que o Docker Compose reconstrua as imagens antes de iniciar os contêi
 docker-compose up --build -d
 ```
 
-Para parar o `docker-compose.yaml` execute o comando abaixo:
+Para `parar` o `docker-compose.yaml` execute o comando abaixo:
 ```shell
 docker-compose down
+```
+
+Para `parar` e `remover` as imagens associadas ao `docker-compose`, execute o comando abaixo:
+
+```shell
+docker-compose down --rmi all
 ```
 
 ---
